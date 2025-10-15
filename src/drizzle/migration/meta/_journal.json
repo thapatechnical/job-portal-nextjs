@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1759648783567,
+      "tag": "0000_outgoing_landau",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1760338726250,
+      "tag": "0001_lazy_gorgon",
+      "breakpoints": true
+    }
+  ]
+}

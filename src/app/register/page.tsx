@@ -20,6 +20,8 @@ import { Eye, EyeOff, Lock, Mail, User, UserCheck } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
+import { registerUserAction } from "../../features/auth/server/auth.actions";
 
 interface RegistrationFormData {
   name: string;
@@ -50,11 +52,27 @@ const Registration: React.FC = () => {
     }));
   };
 
-  console.log(formData);
+  // console.log(formData);
 
-  const handleSubmit = (e: FormEvent) => {
-    try {
-    } catch (error) {}
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    // Here you would typically make your API call
+    const registrationData = {
+      name: formData.name.trim(),
+      userName: formData.userName.trim(),
+      email: formData.email.toLowerCase().trim(),
+      password: formData.password,
+      role: formData.role,
+    };
+
+    if (formData.password !== formData.confirmPassword)
+      return toast.error("Password are not matching");
+
+    const result = await registerUserAction(registrationData);
+
+    if (result.status === "SUCCESS") toast.success(result.message);
+    else toast.error(result.message);
   };
 
   return (
@@ -77,6 +95,7 @@ const Registration: React.FC = () => {
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="name"
+                  name="name"
                   type="text"
                   placeholder="Enter your full name"
                   required
@@ -96,6 +115,7 @@ const Registration: React.FC = () => {
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="userName"
+                  name="userName"
                   type="text"
                   placeholder="Choose a username"
                   required
@@ -115,6 +135,7 @@ const Registration: React.FC = () => {
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="Enter your email"
                   required
@@ -131,6 +152,7 @@ const Registration: React.FC = () => {
             <div className="space-y-2 w-full">
               <Label htmlFor="role">I am a *</Label>
               <Select
+                name="role"
                 value={formData.role}
                 onValueChange={(value: "applicant" | "employer") =>
                   handleInputChange("role", value)
@@ -153,6 +175,7 @@ const Registration: React.FC = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a strong password"
                   required
@@ -186,6 +209,7 @@ const Registration: React.FC = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="confirmPassword"
+                  name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   required
