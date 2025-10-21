@@ -4,6 +4,12 @@ import { db } from "@/config/db";
 import { users } from "@/drizzle/schema";
 import argon2 from "argon2";
 import { eq, or } from "drizzle-orm";
+import {
+  LoginUserData,
+  loginUserSchema,
+  RegisterUserData,
+  registerUserSchema,
+} from "../auth.schema";
 
 // 👉 Server Actions in Next.js are special functions that run only on the server, not in the user’s browser.
 
@@ -17,16 +23,12 @@ import { eq, or } from "drizzle-orm";
 
 // It provides methods like .get(), .set(), .append(), and .entries() — which you’re already using here.
 
-export const registerUserAction = async (data: {
-  name: string;
-  userName: string;
-  email: string;
-  password: string;
-  role: "applicant" | "employer";
-}) => {
+export const registerUserAction = async (data: RegisterUserData) => {
   try {
+    const { data: validatedData, error } = registerUserSchema.safeParse(data);
+    if (error) return { status: "ERROR", message: error.issues[0].message };
     // console.log(formData.get("name"));
-    const { name, userName, email, password, role } = data;
+    const { name, userName, email, password, role } = validatedData;
 
     const [user] = await db
       .select()
@@ -61,14 +63,18 @@ export const registerUserAction = async (data: {
   }
 };
 
-type LoginData = {
-  email: string;
-  password: string;
-};
+// type LoginData = {
+//   email: string;
+//   password: string;
+// };
 
-export const loginUserAction = async (data: LoginData) => {
+export const loginUserAction = async (data: LoginUserData) => {
   try {
-    const { email, password } = data;
+    const { data: validatedData, error } = loginUserSchema.safeParse(data);
+    if (error) return { status: "ERROR", message: error.issues[0].message };
+    // console.log(formData.get("name"));
+    const { email, password } = validatedData;
+    // const { email, password } = data;
 
     const [user] = await db.select().from(users).where(eq(users.email, email));
 
