@@ -10,6 +10,7 @@ import {
   RegisterUserData,
   registerUserSchema,
 } from "../auth.schema";
+import { createSessionAndSetCookies } from "./use-cases/sessions";
 
 // 👉 Server Actions in Next.js are special functions that run only on the server, not in the user’s browser.
 
@@ -47,9 +48,13 @@ export const registerUserAction = async (data: RegisterUserData) => {
 
     const hashPassword = await argon2.hash(password);
 
-    await db
+    const [result] = await db
       .insert(users)
       .values({ name, userName, email, password: hashPassword, role });
+
+    console.log(result);
+
+    await createSessionAndSetCookies(result.insertId);
 
     return {
       status: "SUCCESS",
@@ -86,6 +91,8 @@ export const loginUserAction = async (data: LoginUserData) => {
 
     if (!isValidPassword)
       return { status: "ERROR", message: "Invalid Email or Password" };
+
+    await createSessionAndSetCookies(user.id);
 
     return {
       status: "SUCCESS",
