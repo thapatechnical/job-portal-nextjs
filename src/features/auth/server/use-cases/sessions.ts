@@ -5,6 +5,7 @@ import { sessions, users } from "@/drizzle/schema";
 import { db } from "@/config/db";
 import { SESSION_LIFETIME, SESSION_REFRESH_TIME } from "@/config/constant";
 import { eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
 
 type CreateSessionData = {
   userAgent: string;
@@ -114,6 +115,6 @@ export const validateSessionAndGetUser = async (session: string) => {
   return user;
 };
 
-const invalidateSession = async (id: string) => {
+export const invalidateSession = async (id: string) => {
   await db.delete(sessions).where(eq(sessions.id, id));
 };
